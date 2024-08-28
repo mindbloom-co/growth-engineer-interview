@@ -58,6 +58,21 @@ def reserve():
     # Successful reservation
     return jsonify({"appointment_id": data['appointment_id']})
 
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"error": str(error)}), 400
+
+@app.errorhandler(409)
+def conflict(error):
+    return jsonify({"error": str(error)}), 409
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({"error": "Not found"}), 404
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({"error": "Internal server error"}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
-    
