@@ -3,20 +3,29 @@ import uuid
 from datetime import datetime, timedelta
 import random
 import re
+import pytz
 
 app = Flask(__name__)
 
 @app.route('/availability', methods=['GET'])
 def get_availability():
     appointments = []
-    for _ in range(6):
+    pacific_tz = pytz.timezone('US/Pacific')
+    now = datetime.now(pacific_tz)
+    
+    for _ in range(16):
         random_days = random.randint(0, 14)
-        random_seconds = random.randint(0, 86400)  # Seconds in a day
-        starts_at = (datetime.now() + timedelta(days=random_days, seconds=random_seconds)).isoformat()
+        random_minutes = random.randint(0, 660)  # 11 hours in minutes (8AM - 7PM)
+        
+        appointment_date = now.date() + timedelta(days=random_days)
+        appointment_time = datetime.combine(appointment_date, datetime.min.time())
+        appointment_time = pacific_tz.localize(appointment_time)
+        
+        starts_at = appointment_time.replace(hour=8) + timedelta(minutes=random_minutes)
         
         appointment = {
-            "id": str(uuid.uuid4()),  # Using UUID v4 as v7 is not standard in Python's uuid module
-            "starts_at": starts_at
+            "id": str(uuid.uuid4()),
+            "starts_at": starts_at.isoformat()
         }
         appointments.append(appointment)
     
