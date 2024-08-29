@@ -2,14 +2,18 @@ import random
 import re
 import uuid
 from datetime import datetime, timedelta
+from flask_cors import CORS, cross_origin
 
 import pytz
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 @app.route("/availability", methods=["GET"])
+@cross_origin()
 def get_availability():
     appointments = []
     pacific_tz = pytz.timezone("US/Pacific")
@@ -32,6 +36,7 @@ def get_availability():
 
 
 @app.route("/reserve", methods=["POST"])
+@cross_origin()
 def reserve():
     if request.args.get("conflict", "").lower() == "true":
         return jsonify({"error": "Conflict occurred"}), 409
